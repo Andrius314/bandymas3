@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .gallery-item {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer; /* Add cursor style to indicate clickability */
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Lightbox styles */
+        .lightbox {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            z-index: 1000; /* Ensure it's on top */
+            justify-content: center;
+            align-items: center;
+            overflow: auto; /* Enable scroll if image is too large */
+        }
+
+        .lightbox-content {
+            display: flex;
+            flex-direction: column;
+            max-width: 90%; /* Max width of the image */
+            max-height: 90%; /* Max height of the image */
+            margin: auto; /* Center the content */
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: block; /* Remove extra space below image */
+        }
+
+        .lightbox-close {
+            color: white;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery">
+        <div class="gallery-item" onclick="openLightbox('img/image (1).jpg', 'iamcreator')">
+            <img src="img/image (1).jpg" alt="iamcreator">
+        </div>
+        <div class="gallery-item" onclick="openLightbox('img/a-photo-of-a-woman-with-short-dark-hair-holding-a--B1pMzBjSRyeSV3_BnGIhHQ-5okh_IazQkavKgT1ST8ojA.jpeg', 'creator_of_my_life')">
+            <img src="img/a-photo-of-a-woman-with-short-dark-hair-holding-a--B1pMzBjSRyeSV3_BnGIhHQ-5okh_IazQkavKgT1ST8ojA.jpeg" alt="creator_of_my_life">
+        </div>
+        <div class="gallery-item" onclick="openLightbox('img/2af9a4f6-7922-4792-8539-4c535e71d993.png', 'never_give_up')">
+            <img src="img/2af9a4f6-7922-4792-8539-4c535e71d993.png" alt="never_give_up">
+        </div>
+        <div class="gallery-item" onclick="openLightbox('img/a49954d3-e512-4e51-a40b-12407fff89f9.png', 'progressuokime_kartu_logo')">
+            <img src="img/a49954d3-e512-4e51-a40b-12407fff89f9.png" alt="progressuokime_kartu_logo">
+        </div>
+        <div class="gallery-item" onclick="openLightbox('img/academy.jpg', 'future_minds_academy')">
+            <img src="img/academy.jpg" alt="future_minds_academy">
+        </div>
+    </div>
+
+    <!-- Lightbox container -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" class="lightbox-image" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(imgSrc, altText) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+
+            lightboxImg.src = imgSrc; // Ši eilutė naudoja perduotą imgSrc, kuris dabar bus su "img/"
+            lightboxImg.alt = altText;
+            lightbox.style.display = 'flex'; // Or 'block'
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.display = 'none';
+        }
+
+        // Close lightbox if clicking outside the image (on the dark background)
+        const lightbox = document.getElementById('lightbox');
+        lightbox.addEventListener('click', function(event) {
+            // Check if the click was directly on the lightbox background itself,
+            // not on its children (like the image or the close button span inside content)
+            if (event.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Prevent closing lightbox when clicking on the image itself
+        const lightboxContent = document.querySelector('.lightbox-content');
+        lightboxContent.addEventListener('click', function(event) {
+             event.stopPropagation(); // Stop the click event from bubbling up to the parent (lightbox)
+        });
+
+        // Ensure the explicit close button still works even with the above changes
+        const lightboxClose = document.querySelector('.lightbox-close');
+        lightboxClose.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent the click from reaching the background
+             closeLightbox();
+        });
+
+
+    </script>
+</body>
+</html>
