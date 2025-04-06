@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Gallery</title>
+    <!-- Pakeičiau title, kad atspindėtų turinį -->
+    <title>Nuolaidų Kortelės - Galerija</title>
     <style>
         body {
             font-family: sans-serif;
             margin: 0;
             background-color: #f4f4f4;
+        }
+
+        /* Stilius pridėtai antraštei */
+        h1.page-title {
+            text-align: center; /* Centruoti tekstą */
+            margin-top: 20px;   /* Pridėti šiek tiek tarpo viršuje */
+            margin-bottom: 20px; /* Pridėti šiek tiek tarpo apačioje */
+            color: #333;        /* Tamsesnė teksto spalva */
         }
 
         .gallery {
@@ -17,7 +26,8 @@
             gap: 20px;
             padding: 20px;
             max-width: 1200px;
-            margin: 20px auto;
+            /* Pašalinau viršutinį margin, nes dabar jį valdo h1 */
+            margin: 0 auto 20px auto;
         }
 
         .gallery-item {
@@ -25,7 +35,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease-in-out;
-            cursor: pointer; /* Add cursor style to indicate clickability */
+            cursor: pointer;
         }
 
         .gallery-item:hover {
@@ -40,31 +50,31 @@
 
         /* Lightbox styles */
         .lightbox {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
-            z-index: 1000; /* Ensure it's on top */
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            overflow: auto; /* Enable scroll if image is too large */
+            overflow: auto;
         }
 
         .lightbox-content {
             display: flex;
             flex-direction: column;
-            max-width: 90%; /* Max width of the image */
-            max-height: 90%; /* Max height of the image */
-            margin: auto; /* Center the content */
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
         }
 
         .lightbox-image {
             max-width: 100%;
             max-height: 100%;
-            display: block; /* Remove extra space below image */
+            display: block;
         }
 
         .lightbox-close {
@@ -81,10 +91,18 @@
             .gallery {
                 grid-template-columns: 1fr;
             }
+             /* Galbūt sumažinti antraštės dydį mažesniuose ekranuose */
+             h1.page-title {
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- PRIDĖTA ANTRAŠTĖ -->
+    <h1 class="page-title">Nuolaidų Kortelės</h1>
+
     <div class="gallery">
         <div class="gallery-item" onclick="openLightbox('img/image (1).jpg', 'iamcreator')">
             <img src="img/image (1).jpg" alt="iamcreator">
@@ -101,11 +119,12 @@
         <div class="gallery-item" onclick="openLightbox('img/academy.jpg', 'future_minds_academy')">
             <img src="img/academy.jpg" alt="future_minds_academy">
         </div>
+        <!-- Čia galite pridėti daugiau .gallery-item elementų -->
     </div>
 
     <!-- Lightbox container -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <span class="lightbox-close" onclick="closeLightbox()">×</span>
         <div class="lightbox-content">
             <img id="lightbox-img" class="lightbox-image" src="" alt="">
         </div>
@@ -116,9 +135,9 @@
             const lightbox = document.getElementById('lightbox');
             const lightboxImg = document.getElementById('lightbox-img');
 
-            lightboxImg.src = imgSrc; // Ši eilutė naudoja perduotą imgSrc, kuris dabar bus su "img/"
+            lightboxImg.src = imgSrc;
             lightboxImg.alt = altText;
-            lightbox.style.display = 'flex'; // Or 'block'
+            lightbox.style.display = 'flex';
         }
 
         function closeLightbox() {
@@ -126,30 +145,23 @@
             lightbox.style.display = 'none';
         }
 
-        // Close lightbox if clicking outside the image (on the dark background)
         const lightbox = document.getElementById('lightbox');
         lightbox.addEventListener('click', function(event) {
-            // Check if the click was directly on the lightbox background itself,
-            // not on its children (like the image or the close button span inside content)
             if (event.target === lightbox) {
                 closeLightbox();
             }
         });
 
-        // Prevent closing lightbox when clicking on the image itself
         const lightboxContent = document.querySelector('.lightbox-content');
         lightboxContent.addEventListener('click', function(event) {
-             event.stopPropagation(); // Stop the click event from bubbling up to the parent (lightbox)
+             event.stopPropagation();
         });
 
-        // Ensure the explicit close button still works even with the above changes
         const lightboxClose = document.querySelector('.lightbox-close');
         lightboxClose.addEventListener('click', function(event) {
-            event.stopPropagation(); // Prevent the click from reaching the background
+            event.stopPropagation();
              closeLightbox();
         });
-
-
     </script>
 </body>
 </html>
