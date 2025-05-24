@@ -96,6 +96,71 @@
                 font-size: 1.8em;
             }
         }
+
+        /* Styles for filter and sort controls */
+        .controls-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
+            padding: 10px; /* Add some padding around the controls */
+            margin-bottom: 20px; /* Space before the gallery */
+            background-color: #eee; /* Light background for the control bar */
+            border-radius: 8px; /* Rounded corners for the bar */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+            max-width: 1200px; /* Match gallery max-width */
+            margin-left: auto; /* Center the container */
+            margin-right: auto;
+        }
+
+        .controls-container label {
+            margin-left: 15px; /* Space to the left of the label */
+            margin-right: 5px; /* Space between label and select */
+            font-weight: bold; /* Make labels a bit more prominent */
+            color: #333;
+        }
+
+        /* Add a specific rule for the first label to avoid too much left margin */
+        .controls-container label:first-of-type {
+            margin-left: 0;
+        }
+
+        .controls-container select {
+            padding: 8px 12px;
+            margin: 5px 10px 5px 0; /* Top, Right, Bottom, Left margins */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .controls-container select:hover {
+            border-color: #888;
+        }
+
+        /* Responsive adjustments for controls */
+        @media (max-width: 600px) {
+            .controls-container {
+                flex-direction: column; /* Stack controls vertically */
+                align-items: stretch; /* Stretch items to fill width */
+            }
+
+            .controls-container label {
+                margin-left: 0; /* Reset left margin */
+                margin-top: 10px; /* Add space above label when stacked */
+                margin-bottom: 3px; /* Reduce space below label */
+            }
+            .controls-container label:first-of-type {
+                margin-top: 0; /* No top margin for the very first label when stacked */
+            }
+
+            .controls-container select {
+                width: 100%; /* Make selects take full width */
+                margin-right: 0; /* Reset right margin */
+                margin-left: 0; /* Reset left margin */
+            }
+        }
     </style>
 </head>
 <body>
@@ -103,20 +168,35 @@
     <!-- PRIDĖTA ANTRAŠTĖ -->
     <h1 class="page-title">Nuolaidų Kortelės</h1>
 
+    <div class="controls-container">
+        <label for="category-filter">Category:</label>
+        <select id="category-filter">
+            <option value="all">All</option>
+            <option value="groceries">Groceries</option>
+            <option value="wholesale">Wholesale</option>
+        </select>
+
+        <label for="sort-control">Sort by:</label>
+        <select id="sort-control">
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+        </select>
+    </div>
+
     <div class="gallery">
-        <div class="gallery-item" onclick="openLightbox('img/iki.jpg', 'iamcreator')">
+        <div class="gallery-item" onclick="openLightbox('img/iki.jpg', 'iamcreator')" data-name="Iki" data-category="groceries">
             <img src="img/iki.jpg" alt="iamcreator">
         </div>
-        <div class="gallery-item" onclick="openLightbox('img/maxima.jpg', 'creator_of_my_life')">
+        <div class="gallery-item" onclick="openLightbox('img/maxima.jpg', 'creator_of_my_life')" data-name="Maxima" data-category="groceries">
             <img src="img/maxima.jpg" alt="creator_of_my_life">
         </div>
-        <div class="gallery-item" onclick="openLightbox('img/lidl.jpg', 'lidl')">
+        <div class="gallery-item" onclick="openLightbox('img/lidl.jpg', 'lidl')" data-name="Lidl" data-category="groceries">
             <img src="img/lidl.jpg" alt="lidl">
         </div>
-        <div class="gallery-item" onclick="openLightbox('img/norfa.jpg', 'norfa')">
+        <div class="gallery-item" onclick="openLightbox('img/norfa.jpg', 'norfa')" data-name="Norfa" data-category="groceries">
             <img src="img/norfa.jpg" alt="norfa">
         </div>
-        <div class="gallery-item" onclick="openLightbox('img/promo.jpg', 'promo')">
+        <div class="gallery-item" onclick="openLightbox('img/promo.jpg', 'promo')" data-name="Promo" data-category="wholesale">
             <img src="img/promo.jpg" alt="promo">
         </div>
         <!-- Čia galite pridėti daugiau .gallery-item elementų -->
@@ -161,6 +241,61 @@
         lightboxClose.addEventListener('click', function(event) {
             event.stopPropagation();
              closeLightbox();
+        });
+
+        // New filtering and sorting script
+        document.addEventListener('DOMContentLoaded', () => { // Ensure DOM is loaded
+            const categoryFilter = document.getElementById('category-filter');
+            const sortControl = document.getElementById('sort-control');
+            const gallery = document.querySelector('.gallery');
+
+            function applyFiltersAndSorting() {
+                const selectedCategory = categoryFilter.value;
+                const sortOrder = sortControl.value;
+                // Get all items every time to ensure we're working with the current DOM state
+                let items = Array.from(gallery.querySelectorAll('.gallery-item')); 
+
+                // 1. Filtering
+                items.forEach(item => {
+                    const itemCategory = item.dataset.category;
+                    if (selectedCategory === 'all' || itemCategory === selectedCategory) {
+                        item.style.display = ''; // Reset to default display (will be controlled by CSS grid)
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // 2. Sorting (only visible items)
+                let visibleItems = items.filter(item => item.style.display !== 'none');
+
+                visibleItems.sort((a, b) => {
+                    const nameA = a.dataset.name.toLowerCase();
+                    const nameB = b.dataset.name.toLowerCase();
+
+                    if (sortOrder === 'name-asc') {
+                        if (nameA < nameB) return -1;
+                        if (nameA > nameB) return 1;
+                        return 0;
+                    } else if (sortOrder === 'name-desc') {
+                        if (nameA > nameB) return -1;
+                        if (nameA < nameB) return 1;
+                        return 0;
+                    }
+                    return 0; // Default no sort
+                });
+
+                // Re-append sorted items
+                // This efficiently reorders the existing elements in the DOM
+                visibleItems.forEach(item => {
+                    gallery.appendChild(item); 
+                });
+            }
+
+            categoryFilter.addEventListener('change', applyFiltersAndSorting);
+            sortControl.addEventListener('change', applyFiltersAndSorting);
+
+            // Initial application to set initial state based on default dropdown values
+            applyFiltersAndSorting();
         });
     </script>
 </body>
