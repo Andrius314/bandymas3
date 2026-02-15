@@ -1,1031 +1,381 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="lt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prompt Forge | AI Prompt Vault</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prompt Forge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f5f7ef;
-      --surface: #ffffff;
-      --surface-soft: #f0f2e6;
-      --surface-strong: #e7edd0;
-      --text: #163029;
-      --text-soft: #46635a;
-      --accent: #1b8774;
-      --accent-strong: #156558;
-      --alt: #e69531;
-      --danger: #bf3a3a;
-      --border: #c8d4c6;
-      --shadow: 0 18px 36px rgba(22, 48, 41, 0.12);
-      --radius: 16px;
+    :root{
+      --bg:#f4f7ef;--bg2:#eef6ee;--card:#fff;--soft:#f0f3e6;--text:#163029;--muted:#4c695f;
+      --accent:#1d8a75;--danger:#bf3a3a;--border:#c9d6c8;--shadow:0 18px 36px rgba(22,48,41,.12)
     }
-
-    * {
-      box-sizing: border-box;
+    body.dark{
+      --bg:#101915;--bg2:#14221c;--card:#1a2722;--soft:#24342e;--text:#e2f1ea;--muted:#a9c8bd;
+      --accent:#34b296;--danger:#ff9f9f;--border:#324841;--shadow:0 18px 36px rgba(0,0,0,.35)
     }
-
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-      color: var(--text);
-      font-family: "Space Grotesk", "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #f5f7ef 0%, #edf7ef 40%, #f9f2df 100%);
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:"Space Grotesk","Segoe UI",sans-serif;color:var(--text);
+      background:linear-gradient(135deg,var(--bg),var(--bg2))}
+    .app{max-width:1240px;margin:0 auto;padding:24px 16px 32px}
+    .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+    .title{margin:0;font-size:clamp(1.7rem,3vw,2.3rem)}
+    .sub{margin:5px 0 0;color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .layout{display:grid;grid-template-columns:minmax(300px,36%) minmax(0,1fr);gap:12px;margin-top:14px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .head{padding:12px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--card),var(--soft))}
+    .head h2{margin:0;font-size:1.04rem}
+    .body{padding:12px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .field{margin-bottom:10px}
+    label{display:block;margin-bottom:6px;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    input,select,textarea,button{font:inherit}
+    input,select,textarea{
+      width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 11px;background:var(--card);color:var(--text)
     }
-
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      inset: auto;
-      pointer-events: none;
-      z-index: -1;
-      opacity: 0.32;
-    }
-
-    body::before {
-      top: -120px;
-      right: -120px;
-      width: 420px;
-      height: 420px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #c6f0df 0%, rgba(198, 240, 223, 0) 72%);
-    }
-
-    body::after {
-      left: -120px;
-      bottom: -120px;
-      width: 440px;
-      height: 440px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffe2b6 0%, rgba(255, 226, 182, 0) 72%);
-    }
-
-    .app-shell {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 28px 20px 36px;
-      animation: intro 0.7s ease;
-    }
-
-    @keyframes intro {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .topbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .headline {
-      margin: 0;
-      font-size: clamp(1.7rem, 3vw, 2.4rem);
-      letter-spacing: -0.03em;
-    }
-
-    .subline {
-      margin: 6px 0 0;
-      color: var(--text-soft);
-      font-size: 0.95rem;
-    }
-
-    .quick-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(300px, 36%) minmax(0, 1fr);
-      gap: 14px;
-    }
-
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .panel-head {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, #fcfef8 0%, #f7faef 100%);
-    }
-
-    .panel-title {
-      margin: 0;
-      font-size: 1.06rem;
-    }
-
-    .panel-body {
-      padding: 14px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--text-soft);
-      font-size: 0.83rem;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font: inherit;
-      color: var(--text);
-      background: #fff;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    textarea {
-      min-height: 210px;
-      resize: vertical;
-      font-family: "IBM Plex Mono", ui-monospace, monospace;
-      font-size: 0.92rem;
-      line-height: 1.4;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(27, 135, 116, 0.16);
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .field {
-      margin-bottom: 12px;
-    }
-
-    button {
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 9px 12px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: transform 0.14s ease, filter 0.14s ease;
-    }
-
-    button:hover {
-      filter: brightness(0.97);
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: var(--surface-soft);
-      border-color: var(--border);
-      color: var(--text);
-    }
-
-    .btn-alt {
-      background: #fff4e3;
-      border-color: #f0d1a6;
-      color: #794500;
-    }
-
-    .btn-danger {
-      background: #ffecec;
-      border-color: #efc6c6;
-      color: var(--danger);
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1fr 140px;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .filter-bar {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .tag-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .chip {
-      border: 1px solid #cde5da;
-      border-radius: 999px;
-      background: #f4fcf7;
-      color: #206154;
-      font-size: 0.82rem;
-      padding: 4px 10px;
-      cursor: pointer;
-    }
-
-    .chip.active {
-      background: #d8f3e9;
-      border-color: #8fd3bc;
-      font-weight: 700;
-    }
-
-    .prompt-list {
-      display: grid;
-      gap: 8px;
-      max-height: calc(100vh - 300px);
-      overflow: auto;
-      padding-right: 4px;
-    }
-
-    .prompt-card {
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 10px;
-      cursor: pointer;
-      background: #fff;
-      animation: rise 0.28s ease both;
-    }
-
-    @keyframes rise {
-      from {
-        opacity: 0;
-        transform: translateY(5px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .prompt-card.active {
-      border-color: #82c7b2;
-      background: #f4fdf9;
-      box-shadow: 0 8px 18px rgba(27, 135, 116, 0.1);
-    }
-
-    .prompt-card h3 {
-      margin: 0 0 4px;
-      font-size: 0.98rem;
-    }
-
-    .meta {
-      font-size: 0.79rem;
-      color: var(--text-soft);
-      margin-bottom: 5px;
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      margin: 0 4px 4px 0;
-      background: #ebf5ef;
-      border: 1px solid #d4e6da;
-      border-radius: 999px;
-      font-size: 0.73rem;
-      padding: 2px 8px;
-      color: #2d564a;
-    }
-
-    .status {
-      margin-top: 12px;
-      min-height: 20px;
-      color: #215447;
-      font-size: 0.89rem;
-      font-family: "IBM Plex Mono", ui-monospace, monospace;
-    }
-
-    .version-list {
-      margin-top: 8px;
-      max-height: 200px;
-      overflow: auto;
-      display: grid;
-      gap: 7px;
-    }
-
-    .version-item {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 9px;
-      background: #f9fcf6;
-    }
-
-    .version-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      font-size: 0.82rem;
-      color: var(--text-soft);
-    }
-
-    .tiny {
-      font-size: 0.8rem;
-    }
-
-    .empty {
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      text-align: center;
-      color: var(--text-soft);
-      background: #fbfdf8;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    @media (max-width: 980px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .prompt-list {
-        max-height: 340px;
-      }
-    }
-
-    @media (max-width: 620px) {
-      .app-shell {
-        padding: 18px 12px 26px;
-      }
-
-      .toolbar,
-      .filter-bar {
-        grid-template-columns: 1fr;
-      }
-
-      button {
-        width: 100%;
-      }
-    }
+    textarea{min-height:200px;resize:vertical;font-family:"IBM Plex Mono",monospace;font-size:.92rem;line-height:1.4}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,138,117,.16)}
+    button{border:1px solid transparent;border-radius:12px;padding:9px 11px;cursor:pointer}
+    .b1{background:var(--accent);color:#fff}
+    .b2{background:var(--soft);color:var(--text);border-color:var(--border)}
+    .b3{background:#fff3df;color:#784600;border-color:#ebcc9f}
+    .b4{background:#ffeceb;color:var(--danger);border-color:#efc6c6}
+    body.dark .b3{background:#3b321d;color:#f0d9a9;border-color:#675932}
+    body.dark .b4{background:#3a2121;border-color:#5d3838}
+    .toolbar{display:grid;grid-template-columns:1fr 160px;gap:8px;margin-bottom:8px}
+    .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .chip{padding:4px 9px;border-radius:999px;border:1px solid var(--border);background:var(--soft);font-size:.82rem;cursor:pointer}
+    .chip.active{background:#d8f3e9;border-color:#8ed4bc;color:#114a3f;font-weight:700}
+    body.dark .chip.active{background:#245245;border-color:#4a8a77;color:#dbf4eb}
+    .list{display:grid;gap:8px;max-height:calc(100vh - 300px);overflow:auto}
+    .card{border:1px solid var(--border);border-radius:13px;padding:10px;background:var(--card);cursor:pointer}
+    .card.active{border-color:#82c7b2;background:#f4fdf9}
+    body.dark .card.active{background:#20332d;border-color:#4c8a77}
+    .card h3{margin:0 0 4px;font-size:.97rem}
+    .meta{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:var(--soft);font-size:.72rem;margin:0 4px 4px 0}
+    .status{min-height:20px;margin:10px 0 0;font-size:.88rem;color:#215447;font-family:"IBM Plex Mono",monospace}
+    body.dark .status{color:#7fd8bd}
+    .versions{max-height:190px;overflow:auto;display:grid;gap:7px}
+    .v{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--soft)}
+    .vtop{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.8rem}
+    .empty{padding:18px;border-radius:12px;border:1px dashed var(--border);text-align:center;color:var(--muted);background:var(--soft)}
+    .hidden{display:none}
+    @media(max-width:960px){.layout{grid-template-columns:1fr}.list{max-height:320px}}
+    @media(max-width:620px){.toolbar,.filters{grid-template-columns:1fr}.actions>*{width:100%}}
   </style>
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
+  <main class="app">
+    <header class="top">
       <div>
-        <h1 class="headline">Prompt Forge</h1>
-        <p class="subline">Save, version, filter, and reuse high performing prompts.</p>
+        <h1 class="title" id="headline">Prompt Forge</h1>
+        <p class="sub" id="subline">Saugok, versijuok ir naudok promptus kasdien.</p>
       </div>
-      <div class="quick-actions">
-        <button id="newPromptBtn" class="btn-primary">New Prompt</button>
-        <button id="exportBtn" class="btn-secondary">Export JSON</button>
-        <button id="importBtn" class="btn-secondary">Import JSON</button>
+      <div class="actions">
+        <select id="lang" aria-label="Language">
+          <option value="lt">Lietuvių</option>
+          <option value="en">English</option>
+        </select>
+        <button id="themeBtn" class="b2">Naktinis režimas</button>
+        <button id="newBtn" class="b1">Naujas promptas</button>
+        <button id="exportBtn" class="b2">Eksportuoti JSON</button>
+        <button id="importBtn" class="b2">Importuoti JSON</button>
         <input id="importInput" class="hidden" type="file" accept="application/json">
       </div>
     </header>
 
     <div class="layout">
       <section class="panel">
-        <div class="panel-head">
-          <h2 class="panel-title">Vault</h2>
-        </div>
-        <div class="panel-body">
+        <div class="head"><h2 id="vaultTitle">Promptų saugykla</h2></div>
+        <div class="body">
           <div class="toolbar">
-            <input id="searchInput" type="search" placeholder="Search title, tag, or text...">
-            <select id="sortSelect">
-              <option value="updated">Sort: Recent</option>
-              <option value="title">Sort: Title</option>
-              <option value="used">Sort: Most Used</option>
-              <option value="favorite">Sort: Favorite First</option>
+            <input id="search" type="search" placeholder="Ieškok pagal pavadinimą, žymę ar turinį...">
+            <select id="sort">
+              <option value="updated">Rikiuoti: naujausi</option>
+              <option value="title">Rikiuoti: pavadinimas</option>
+              <option value="used">Rikiuoti: naudoti</option>
+              <option value="favorite">Rikiuoti: favoritai</option>
             </select>
           </div>
-          <div class="filter-bar">
+          <div class="filters">
             <select id="toneFilter">
-              <option value="all">All Tones</option>
-              <option value="professional">Professional</option>
-              <option value="friendly">Friendly</option>
-              <option value="direct">Direct</option>
-              <option value="creative">Creative</option>
+              <option value="all">Visi tonai</option>
+              <option value="practical">Praktiškas</option>
+              <option value="supportive">Palaikantis</option>
+              <option value="direct">Tiesus</option>
+              <option value="creative">Kūrybiškas</option>
             </select>
             <select id="typeFilter">
-              <option value="all">All Types</option>
-              <option value="marketing">Marketing</option>
-              <option value="coding">Coding</option>
-              <option value="sales">Sales</option>
-              <option value="support">Support</option>
-              <option value="research">Research</option>
+              <option value="all">Visos temos</option>
+              <option value="planning">Planavimas</option>
+              <option value="health">Sveikata</option>
+              <option value="relationships">Santykiai</option>
+              <option value="finance">Finansai</option>
+              <option value="mindset">Mąstysena</option>
             </select>
           </div>
-          <div id="tagCloud" class="tag-cloud"></div>
-          <div id="promptList" class="prompt-list"></div>
+          <div id="tags" class="tags"></div>
+          <div id="list" class="list"></div>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head">
-          <h2 class="panel-title">Editor</h2>
-        </div>
-        <div class="panel-body">
-          <form id="promptForm">
+        <div class="head"><h2 id="editorTitle">Redaktorius</h2></div>
+        <div class="body">
+          <form id="form">
             <div class="field">
-              <label for="titleInput">Prompt Title</label>
-              <input id="titleInput" required maxlength="90" placeholder="Example: SEO Blog Outline Builder">
+              <label for="title" id="lblTitle">Prompto pavadinimas</label>
+              <input id="title" maxlength="90" required placeholder="Pvz.: Savaitės plano architektas">
             </div>
             <div class="row">
-              <div class="field" style="flex:1; min-width:160px;">
-                <label for="toneSelect">Tone</label>
-                <select id="toneSelect" required>
-                  <option value="professional">Professional</option>
-                  <option value="friendly">Friendly</option>
-                  <option value="direct">Direct</option>
-                  <option value="creative">Creative</option>
+              <div class="field" style="flex:1;min-width:150px">
+                <label for="tone" id="lblTone">Tonas</label>
+                <select id="tone" required>
+                  <option value="practical">Praktiškas</option>
+                  <option value="supportive">Palaikantis</option>
+                  <option value="direct">Tiesus</option>
+                  <option value="creative">Kūrybiškas</option>
                 </select>
               </div>
-              <div class="field" style="flex:1; min-width:160px;">
-                <label for="typeSelect">Type</label>
-                <select id="typeSelect" required>
-                  <option value="marketing">Marketing</option>
-                  <option value="coding">Coding</option>
-                  <option value="sales">Sales</option>
-                  <option value="support">Support</option>
-                  <option value="research">Research</option>
+              <div class="field" style="flex:1;min-width:150px">
+                <label for="type" id="lblType">Tema</label>
+                <select id="type" required>
+                  <option value="planning">Planavimas</option>
+                  <option value="health">Sveikata</option>
+                  <option value="relationships">Santykiai</option>
+                  <option value="finance">Finansai</option>
+                  <option value="mindset">Mąstysena</option>
                 </select>
               </div>
             </div>
             <div class="field">
-              <label for="tagsInput">Tags (comma separated)</label>
-              <input id="tagsInput" placeholder="seo, content, startup">
+              <label for="tagsInput" id="lblTags">Žymės (kableliais)</label>
+              <input id="tagsInput" placeholder="planavimas, energija, stresas">
             </div>
             <div class="field">
-              <label for="noteInput">Change Note</label>
-              <input id="noteInput" maxlength="120" placeholder="What changed in this version?">
+              <label for="note" id="lblNote">Pakeitimo pastaba</label>
+              <input id="note" maxlength="120" placeholder="Kas pasikeitė šioje versijoje?">
             </div>
             <div class="field">
-              <label for="contentInput">Prompt Body</label>
-              <textarea id="contentInput" required placeholder="Write your prompt template here..."></textarea>
+              <label for="content" id="lblBody">Prompto tekstas</label>
+              <textarea id="content" required placeholder="Rašyk prompto šabloną..."></textarea>
             </div>
-
             <div class="row">
-              <button type="submit" class="btn-primary">Save Prompt</button>
-              <button id="copyBtn" type="button" class="btn-alt">Copy Prompt</button>
-              <button id="duplicateBtn" type="button" class="btn-secondary">Duplicate</button>
-              <button id="favoriteBtn" type="button" class="btn-secondary">Toggle Favorite</button>
-              <button id="deleteBtn" type="button" class="btn-danger">Delete</button>
+              <button class="b1" type="submit" id="saveBtn">Išsaugoti</button>
+              <button class="b3" type="button" id="copyBtn">Kopijuoti</button>
+              <button class="b2" type="button" id="dupBtn">Dubliuoti</button>
+              <button class="b2" type="button" id="favBtn">Perjungti favoritą</button>
+              <button class="b4" type="button" id="delBtn">Trinti</button>
             </div>
           </form>
-
-          <p id="status" class="status"></p>
-
-          <section>
-            <h3 class="panel-title tiny">Version History</h3>
-            <div id="versionList" class="version-list"></div>
-          </section>
+          <p class="status" id="status"></p>
+          <h3 id="verTitle" style="margin:10px 0 6px;font-size:.92rem">Versijų istorija</h3>
+          <div id="versions" class="versions"></div>
         </div>
       </section>
     </div>
   </main>
 
   <script>
-    const STORAGE_KEY = "prompt_forge_v1";
-    const ui = {
-      list: document.getElementById("promptList"),
-      form: document.getElementById("promptForm"),
-      status: document.getElementById("status"),
-      search: document.getElementById("searchInput"),
-      sort: document.getElementById("sortSelect"),
-      toneFilter: document.getElementById("toneFilter"),
-      typeFilter: document.getElementById("typeFilter"),
-      tagCloud: document.getElementById("tagCloud"),
-      versionList: document.getElementById("versionList"),
-      importInput: document.getElementById("importInput"),
-      titleInput: document.getElementById("titleInput"),
-      toneSelect: document.getElementById("toneSelect"),
-      typeSelect: document.getElementById("typeSelect"),
-      tagsInput: document.getElementById("tagsInput"),
-      noteInput: document.getElementById("noteInput"),
-      contentInput: document.getElementById("contentInput"),
-      newPromptBtn: document.getElementById("newPromptBtn"),
-      exportBtn: document.getElementById("exportBtn"),
-      importBtn: document.getElementById("importBtn"),
-      copyBtn: document.getElementById("copyBtn"),
-      duplicateBtn: document.getElementById("duplicateBtn"),
-      favoriteBtn: document.getElementById("favoriteBtn"),
-      deleteBtn: document.getElementById("deleteBtn")
+    const STORE="prompt_forge_v3",SETTINGS="prompt_forge_settings_v2";
+    const ui={
+      lang:qs("#lang"),themeBtn:qs("#themeBtn"),newBtn:qs("#newBtn"),exportBtn:qs("#exportBtn"),importBtn:qs("#importBtn"),importInput:qs("#importInput"),
+      headline:qs("#headline"),subline:qs("#subline"),vaultTitle:qs("#vaultTitle"),editorTitle:qs("#editorTitle"),
+      search:qs("#search"),sort:qs("#sort"),toneFilter:qs("#toneFilter"),typeFilter:qs("#typeFilter"),tags:qs("#tags"),list:qs("#list"),
+      form:qs("#form"),title:qs("#title"),tone:qs("#tone"),type:qs("#type"),tagsInput:qs("#tagsInput"),note:qs("#note"),content:qs("#content"),
+      saveBtn:qs("#saveBtn"),copyBtn:qs("#copyBtn"),dupBtn:qs("#dupBtn"),favBtn:qs("#favBtn"),delBtn:qs("#delBtn"),
+      status:qs("#status"),versions:qs("#versions"),verTitle:qs("#verTitle"),
+      lblTitle:qs("#lblTitle"),lblTone:qs("#lblTone"),lblType:qs("#lblType"),lblTags:qs("#lblTags"),lblNote:qs("#lblNote"),lblBody:qs("#lblBody")
+    };
+    const I18N={
+      lt:{
+        pageTitle:"Prompt Forge | Asmeninis prompt vault",headline:"Prompt Forge",subline:"Saugok, versijuok ir naudok promptus kasdien.",
+        themeDark:"Naktinis režimas",themeLight:"Šviesus režimas",new:"Naujas promptas",exp:"Eksportuoti JSON",imp:"Importuoti JSON",
+        vault:"Promptų saugykla",editor:"Redaktorius",search:"Ieškok pagal pavadinimą, žymę ar turinį...",
+        sortUpdated:"Rikiuoti: naujausi",sortTitle:"Rikiuoti: pavadinimas",sortUsed:"Rikiuoti: naudoti",sortFav:"Rikiuoti: favoritai",
+        toneAll:"Visi tonai",typeAll:"Visos temos",t_practical:"Praktiškas",t_supportive:"Palaikantis",t_direct:"Tiesus",t_creative:"Kūrybiškas",
+        y_planning:"Planavimas",y_health:"Sveikata",y_relationships:"Santykiai",y_finance:"Finansai",y_mindset:"Mąstysena",
+        lblTitle:"Prompto pavadinimas",lblTone:"Tonas",lblType:"Tema",lblTags:"Žymės (kableliais)",lblNote:"Pakeitimo pastaba",lblBody:"Prompto tekstas",
+        phTitle:"Pvz.: Savaitės plano architektas",phTags:"planavimas, energija, stresas",phNote:"Kas pasikeitė šioje versijoje?",phBody:"Rašyk prompto šabloną...",
+        save:"Išsaugoti",copy:"Kopijuoti",dup:"Dubliuoti",favToggle:"Perjungti favoritą",del:"Trinti",ver:"Versijų istorija",
+        allTag:"visos",used:"naudota {n} k.",favorite:"favoritas",emptyList:"Pagal filtrus promptų nerasta.",emptyVer:"Kol kas versijų nėra.",
+        restore:"Atkurti",created:"Promptas sukurtas.",updated:"Promptas atnaujintas, versija išsaugota.",metaSaved:"Išsaugota.",
+        needData:"Pavadinimas ir tekstas privalomi.",draft:"Paruoštas naujas juodraštis.",copied:"Promptas nukopijuotas.",clipFail:"Nepavyko kopijuoti.",
+        choose:"Pirma pasirink promptą.",duplicated:"Promptas dubliuotas.",favOn:"Pažymėta kaip favoritas.",favOff:"Pašalinta iš favoritų.",
+        delAsk:"Ar tikrai trinti šį promptą?",deleted:"Promptas ištrintas.",exported:"Eksportuota.",imported:"Importuota įrašų: {n}.",
+        importFail:"Importas nepavyko: {e}",themeOn:"Įjungtas naktinis režimas.",themeOff:"Įjungtas šviesus režimas.",langChanged:"Kalba: lietuvių.",
+        vCopied:"Versija nukopijuota.",vRestored:"Versija atkurta redaktoriuje.",rev:"Pataisa",contentUpdate:"Turinio atnaujinimas"
+      },
+      en:{
+        pageTitle:"Prompt Forge | Personal prompt vault",headline:"Prompt Forge",subline:"Save, version and reuse prompts every day.",
+        themeDark:"Dark mode",themeLight:"Light mode",new:"New Prompt",exp:"Export JSON",imp:"Import JSON",
+        vault:"Prompt Vault",editor:"Editor",search:"Search title, tag or content...",
+        sortUpdated:"Sort: recent",sortTitle:"Sort: title",sortUsed:"Sort: used",sortFav:"Sort: favorites",
+        toneAll:"All tones",typeAll:"All themes",t_practical:"Practical",t_supportive:"Supportive",t_direct:"Direct",t_creative:"Creative",
+        y_planning:"Planning",y_health:"Health",y_relationships:"Relationships",y_finance:"Finance",y_mindset:"Mindset",
+        lblTitle:"Prompt title",lblTone:"Tone",lblType:"Theme",lblTags:"Tags (comma separated)",lblNote:"Change note",lblBody:"Prompt body",
+        phTitle:"Example: Weekly Plan Architect",phTags:"planning, energy, stress",phNote:"What changed in this version?",phBody:"Write prompt template...",
+        save:"Save",copy:"Copy",dup:"Duplicate",favToggle:"Toggle favorite",del:"Delete",ver:"Version history",
+        allTag:"all",used:"used {n}x",favorite:"favorite",emptyList:"No prompts match filters.",emptyVer:"No versions yet.",
+        restore:"Restore",created:"Prompt created.",updated:"Prompt updated, version archived.",metaSaved:"Saved.",
+        needData:"Title and body are required.",draft:"New draft ready.",copied:"Prompt copied.",clipFail:"Copy failed.",
+        choose:"Select a prompt first.",duplicated:"Prompt duplicated.",favOn:"Marked as favorite.",favOff:"Removed from favorites.",
+        delAsk:"Delete this prompt?",deleted:"Prompt deleted.",exported:"Export complete.",imported:"Imported records: {n}.",
+        importFail:"Import failed: {e}",themeOn:"Dark mode enabled.",themeOff:"Light mode enabled.",langChanged:"Language: English.",
+        vCopied:"Version copied.",vRestored:"Version restored to editor.",rev:"Revision",contentUpdate:"Content update"
+      }
     };
 
-    let prompts = [];
-    let activePromptId = null;
-    let activeTag = "all";
-
-    const starterPrompts = [
-      {
-        id: uid(),
-        title: "High Intent Landing Page Critic",
-        tone: "direct",
-        type: "marketing",
-        tags: ["conversion", "cro", "landing-page"],
-        content: "You are a senior CRO strategist. Review the landing page text below and return: 1) Biggest friction points, 2) Better headline options, 3) CTA rewrites, 4) Trust element improvements. Keep output concise and ranked by impact.\n\nLanding page copy:\n{{paste_copy_here}}",
-        favorite: true,
-        useCount: 4,
-        createdAt: nowIso(),
-        updatedAt: nowIso(),
-        versions: []
-      },
-      {
-        id: uid(),
-        title: "Feature Spec to Code Plan",
-        tone: "professional",
-        type: "coding",
-        tags: ["architecture", "typescript", "frontend"],
-        content: "Act as a principal engineer. Convert this feature request into:\n- clear acceptance criteria\n- API contract proposal\n- frontend data flow\n- rollout plan with risks\n\nFeature request:\n{{feature_text}}",
-        favorite: false,
-        useCount: 2,
-        createdAt: nowIso(),
-        updatedAt: nowIso(),
-        versions: []
-      },
-      {
-        id: uid(),
-        title: "Customer Objection Neutralizer",
-        tone: "friendly",
-        type: "sales",
-        tags: ["b2b", "outbound", "objections"],
-        content: "You are a B2B sales coach. Rewrite the following response to handle objections without sounding pushy. Use empathy, one proof point, and one soft next step.\n\nProspect message:\n{{prospect_message}}",
-        favorite: false,
-        useCount: 6,
-        createdAt: nowIso(),
-        updatedAt: nowIso(),
-        versions: []
-      }
-    ];
-
+    let state={prompts:[],active:null,tag:"all",lang:"lt",theme:"light",statusKey:"",statusVars:{}};
+    const starter=makeStarter();
     init();
 
-    function init() {
-      prompts = loadPrompts();
-      if (!prompts.length) {
-        prompts = starterPrompts;
-        savePrompts();
-      }
-
-      activePromptId = prompts[0] ? prompts[0].id : null;
-      bindEvents();
-      render();
-      fillFormFromActive();
-      setStatus("Vault ready.");
+    function init(){
+      const set=readJSON(SETTINGS,{});
+      state.lang=set.lang==="en"?"en":"lt";
+      state.theme=set.theme==="dark"?"dark":"light";
+      state.prompts=loadPrompts();
+      if(!state.prompts.length){state.prompts=starter;savePrompts()}
+      state.active=state.prompts[0]?.id||null;
+      bind();
+      ui.lang.value=state.lang;
+      document.body.classList.toggle("dark",state.theme==="dark");
+      applyLanguage();
+      fillForm();
+      status("metaSaved");
     }
 
-    function bindEvents() {
-      ui.form.addEventListener("submit", onSavePrompt);
-      ui.search.addEventListener("input", render);
-      ui.sort.addEventListener("change", render);
-      ui.toneFilter.addEventListener("change", render);
-      ui.typeFilter.addEventListener("change", render);
-      ui.newPromptBtn.addEventListener("click", onCreateNew);
-      ui.copyBtn.addEventListener("click", onCopyPrompt);
-      ui.duplicateBtn.addEventListener("click", onDuplicatePrompt);
-      ui.favoriteBtn.addEventListener("click", onToggleFavorite);
-      ui.deleteBtn.addEventListener("click", onDeletePrompt);
-      ui.exportBtn.addEventListener("click", onExportJson);
-      ui.importBtn.addEventListener("click", () => ui.importInput.click());
-      ui.importInput.addEventListener("change", onImportJson);
+    function bind(){
+      ui.form.addEventListener("submit",onSave);
+      [ui.search,ui.sort,ui.toneFilter,ui.typeFilter].forEach(el=>el.addEventListener("input",render));
+      ui.newBtn.onclick=onNew; ui.copyBtn.onclick=onCopy; ui.dupBtn.onclick=onDup; ui.favBtn.onclick=onFav; ui.delBtn.onclick=onDel;
+      ui.exportBtn.onclick=onExport; ui.importBtn.onclick=()=>ui.importInput.click(); ui.importInput.onchange=onImport;
+      ui.lang.onchange=()=>{state.lang=ui.lang.value==="en"?"en":"lt";saveSettings();applyLanguage();status("langChanged")};
+      ui.themeBtn.onclick=()=>{state.theme=state.theme==="dark"?"light":"dark";document.body.classList.toggle("dark",state.theme==="dark");saveSettings();applyLanguage();status(state.theme==="dark"?"themeOn":"themeOff")};
     }
 
-    function loadPrompts() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        return parsed.map(normalizePrompt).filter(Boolean);
-      } catch (error) {
-        console.error(error);
-        return [];
-      }
+    function loadPrompts(){return readJSON(STORE,[]).map(norm).filter(Boolean)}
+    function savePrompts(){localStorage.setItem(STORE,JSON.stringify(state.prompts))}
+    function saveSettings(){localStorage.setItem(SETTINGS,JSON.stringify({lang:state.lang,theme:state.theme}))}
+    function norm(p){if(!p||!p.id||!p.title||!p.content)return null;return{
+      id:String(p.id),title:String(p.title),tone:pick(p.tone,["practical","supportive","direct","creative"],"practical"),
+      type:pick(p.type,["planning","health","relationships","finance","mindset"],"planning"),
+      tags:Array.isArray(p.tags)?p.tags.map(x=>String(x).trim()).filter(Boolean):[],content:String(p.content),
+      favorite:!!p.favorite,useCount:Number.isFinite(p.useCount)?p.useCount:0,createdAt:p.createdAt||iso(),updatedAt:p.updatedAt||iso(),
+      versions:Array.isArray(p.versions)?p.versions.slice(-50):[]
+    }}
+
+    function applyLanguage(){
+      const t=tr;
+      document.documentElement.lang=state.lang;document.title=t("pageTitle");
+      ui.headline.textContent=t("headline");ui.subline.textContent=t("subline");
+      ui.themeBtn.textContent=state.theme==="dark"?t("themeLight"):t("themeDark");
+      ui.newBtn.textContent=t("new");ui.exportBtn.textContent=t("exp");ui.importBtn.textContent=t("imp");
+      ui.vaultTitle.textContent=t("vault");ui.editorTitle.textContent=t("editor");
+      ui.search.placeholder=t("search");setOpts(ui.sort,{updated:t("sortUpdated"),title:t("sortTitle"),used:t("sortUsed"),favorite:t("sortFav")});
+      setOpts(ui.toneFilter,{all:t("toneAll"),practical:t("t_practical"),supportive:t("t_supportive"),direct:t("t_direct"),creative:t("t_creative")});
+      setOpts(ui.typeFilter,{all:t("typeAll"),planning:t("y_planning"),health:t("y_health"),relationships:t("y_relationships"),finance:t("y_finance"),mindset:t("y_mindset")});
+      setOpts(ui.tone,{practical:t("t_practical"),supportive:t("t_supportive"),direct:t("t_direct"),creative:t("t_creative")});
+      setOpts(ui.type,{planning:t("y_planning"),health:t("y_health"),relationships:t("y_relationships"),finance:t("y_finance"),mindset:t("y_mindset")});
+      ui.lblTitle.textContent=t("lblTitle");ui.lblTone.textContent=t("lblTone");ui.lblType.textContent=t("lblType");
+      ui.lblTags.textContent=t("lblTags");ui.lblNote.textContent=t("lblNote");ui.lblBody.textContent=t("lblBody");
+      ui.title.placeholder=t("phTitle");ui.tagsInput.placeholder=t("phTags");ui.note.placeholder=t("phNote");ui.content.placeholder=t("phBody");
+      ui.saveBtn.textContent=t("save");ui.copyBtn.textContent=t("copy");ui.dupBtn.textContent=t("dup");ui.favBtn.textContent=t("favToggle");ui.delBtn.textContent=t("del");
+      ui.verTitle.textContent=t("ver");refreshStatus();render()
     }
 
-    function savePrompts() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
+    function render(){renderTags();renderList();renderVersions()}
+    function renderTags(){
+      const all=new Set();state.prompts.forEach(p=>p.tags.forEach(tag=>all.add(tag.toLowerCase())));
+      const tags=["all",...Array.from(all).sort((a,b)=>a.localeCompare(b))];ui.tags.innerHTML="";
+      tags.forEach(tag=>{const b=document.createElement("button");b.type="button";b.className="chip"+(state.tag===tag?" active":"");b.textContent=tag==="all"?tr("allTag"):tag;b.onclick=()=>{state.tag=tag;render()};ui.tags.appendChild(b)})
     }
-
-    function normalizePrompt(item) {
-      if (!item || typeof item !== "object") return null;
-      if (!item.id || !item.title || !item.content) return null;
-      return {
-        id: String(item.id),
-        title: String(item.title),
-        tone: safePick(item.tone, ["professional", "friendly", "direct", "creative"], "professional"),
-        type: safePick(item.type, ["marketing", "coding", "sales", "support", "research"], "marketing"),
-        tags: Array.isArray(item.tags) ? item.tags.map((tag) => String(tag).trim()).filter(Boolean) : [],
-        content: String(item.content),
-        favorite: Boolean(item.favorite),
-        useCount: Number.isFinite(item.useCount) ? item.useCount : 0,
-        createdAt: item.createdAt || nowIso(),
-        updatedAt: item.updatedAt || nowIso(),
-        versions: Array.isArray(item.versions) ? item.versions.slice(0, 40) : []
-      };
+    function renderList(){
+      const rows=filtered();ui.list.innerHTML="";
+      if(!rows.length){ui.list.innerHTML=`<div class="empty">${esc(tr("emptyList"))}</div>`;return}
+      rows.forEach(p=>{const el=document.createElement("article");el.className="card"+(p.id===state.active?" active":"");
+        el.innerHTML=`<h3>${esc(p.title)}</h3><div class="meta">${esc(meta(p))}</div><div>${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>`;
+        el.onclick=()=>{state.active=p.id;fillForm();render()};ui.list.appendChild(el)})
     }
-
-    function safePick(value, allowed, fallback) {
-      return allowed.includes(value) ? value : fallback;
-    }
-
-    function render() {
-      renderTagCloud();
-      renderPromptList();
-      renderVersions();
-    }
-
-    function renderTagCloud() {
-      const tags = new Set();
-      prompts.forEach((prompt) => prompt.tags.forEach((tag) => tags.add(tag.toLowerCase())));
-      const sorted = ["all"].concat(Array.from(tags).sort((a, b) => a.localeCompare(b)));
-      ui.tagCloud.innerHTML = "";
-
-      sorted.forEach((tag) => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "chip" + (activeTag === tag ? " active" : "");
-        chip.textContent = tag;
-        chip.addEventListener("click", () => {
-          activeTag = tag;
-          render();
-        });
-        ui.tagCloud.appendChild(chip);
+    function renderVersions(){
+      const a=active();ui.versions.innerHTML="";
+      if(!a||!a.versions.length){ui.versions.innerHTML=`<div class="empty">${esc(tr("emptyVer"))}</div>`;return}
+      [...a.versions].reverse().forEach(v=>{
+        const el=document.createElement("div");el.className="v";
+        el.innerHTML=`<div class="vtop"><strong>${esc(v.note||tr("rev"))}</strong><span>${esc(formatDate(v.createdAt))}</span></div>
+        <div class="row" style="margin-top:7px"><button class="b2" type="button" data-c="${v.id}">${esc(tr("copy"))}</button><button class="b2" type="button" data-r="${v.id}">${esc(tr("restore"))}</button></div>`;
+        ui.versions.appendChild(el)
       });
+      ui.versions.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const v=active().versions.find(x=>x.id===b.dataset.c);if(!v)return;navigator.clipboard.writeText(v.content).then(()=>status("vCopied"))});
+      ui.versions.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const v=active().versions.find(x=>x.id===b.dataset.r);if(!v)return;ui.content.value=v.content;ui.note.value=tr("rev");status("vRestored")})
     }
-
-    function renderPromptList() {
-      const visible = getFilteredPrompts();
-      ui.list.innerHTML = "";
-
-      if (!visible.length) {
-        ui.list.innerHTML = '<div class="empty">No prompts match your filters.</div>';
-        return;
-      }
-
-      visible.forEach((prompt, index) => {
-        const card = document.createElement("article");
-        card.className = "prompt-card" + (prompt.id === activePromptId ? " active" : "");
-        card.style.animationDelay = Math.min(index * 30, 280) + "ms";
-        card.innerHTML = `
-          <h3>${escapeHtml(prompt.title)}</h3>
-          <div class="meta">${prompt.type} | ${prompt.tone} | used ${prompt.useCount}x ${prompt.favorite ? "| favorite" : ""}</div>
-          <div>${prompt.tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
-        `;
-        card.addEventListener("click", () => {
-          activePromptId = prompt.id;
-          fillFormFromActive();
-          render();
-        });
-        ui.list.appendChild(card);
+    function filtered(){
+      const q=ui.search.value.trim().toLowerCase(),tone=ui.toneFilter.value,type=ui.typeFilter.value,sort=ui.sort.value;
+      const out=state.prompts.filter(p=>{
+        const hay=[p.title,p.content,p.tags.join(" "),p.tone,p.type].join(" ").toLowerCase();
+        return (!q||hay.includes(q))&&(tone==="all"||p.tone===tone)&&(type==="all"||p.type===type)&&(state.tag==="all"||p.tags.map(x=>x.toLowerCase()).includes(state.tag))
       });
+      out.sort((a,b)=>sort==="title"?a.title.localeCompare(b.title):sort==="used"?b.useCount-a.useCount:sort==="favorite"?(a.favorite===b.favorite?ms(b.updatedAt)-ms(a.updatedAt):a.favorite?-1:1):ms(b.updatedAt)-ms(a.updatedAt));
+      return out
     }
-
-    function renderVersions() {
-      const active = findActive();
-      ui.versionList.innerHTML = "";
-
-      if (!active) {
-        ui.versionList.innerHTML = '<div class="empty">Create or select a prompt to see versions.</div>';
-        return;
-      }
-
-      if (!active.versions.length) {
-        ui.versionList.innerHTML = '<div class="empty">No saved versions yet. Save changes to build history.</div>';
-        return;
-      }
-
-      const byLatest = active.versions.slice().reverse();
-      byLatest.forEach((version) => {
-        const el = document.createElement("div");
-        el.className = "version-item";
-        el.innerHTML = `
-          <div class="version-row">
-            <strong>${escapeHtml(version.note || "Revision")}</strong>
-            <span>${formatDate(version.createdAt)}</span>
-          </div>
-          <div class="row" style="margin-top:8px;">
-            <button class="btn-secondary tiny" type="button" data-copy="${version.id}">Copy</button>
-            <button class="btn-secondary tiny" type="button" data-restore="${version.id}">Restore to editor</button>
-          </div>
-        `;
-        ui.versionList.appendChild(el);
-      });
-
-      ui.versionList.querySelectorAll("[data-copy]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const version = active.versions.find((v) => v.id === btn.dataset.copy);
-          if (!version) return;
-          navigator.clipboard.writeText(version.content).then(() => {
-            setStatus("Version copied to clipboard.");
-          });
-        });
-      });
-
-      ui.versionList.querySelectorAll("[data-restore]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const version = active.versions.find((v) => v.id === btn.dataset.restore);
-          if (!version) return;
-          ui.contentInput.value = version.content;
-          ui.noteInput.value = "Restored from history";
-          setStatus("Version restored to editor. Save to keep it.");
-        });
-      });
+    function onSave(e){
+      e.preventDefault();const p=payload();if(!p.title||!p.content){status("needData");return}
+      const a=active();
+      if(!a){const n={id:uid(),title:p.title,tone:p.tone,type:p.type,tags:p.tags,content:p.content,favorite:false,useCount:0,createdAt:iso(),updatedAt:iso(),versions:[]};
+        state.prompts.unshift(n);state.active=n.id;savePrompts();render();fillForm();status("created");return}
+      const changed=p.content!==a.content;if(changed)a.versions.push({id:uid(),note:p.note||tr("contentUpdate"),content:a.content,createdAt:iso()});
+      a.versions=a.versions.slice(-50);a.title=p.title;a.tone=p.tone;a.type=p.type;a.tags=p.tags;a.content=p.content;a.updatedAt=iso();
+      savePrompts();render();status(changed?"updated":"metaSaved")
     }
-
-    function getFilteredPrompts() {
-      const search = ui.search.value.trim().toLowerCase();
-      const tone = ui.toneFilter.value;
-      const type = ui.typeFilter.value;
-      const sort = ui.sort.value;
-
-      let output = prompts.filter((prompt) => {
-        const haystack = [prompt.title, prompt.content, prompt.tags.join(" "), prompt.tone, prompt.type].join(" ").toLowerCase();
-        const searchMatch = search ? haystack.includes(search) : true;
-        const toneMatch = tone === "all" ? true : prompt.tone === tone;
-        const typeMatch = type === "all" ? true : prompt.type === type;
-        const tagMatch = activeTag === "all" ? true : prompt.tags.map((tag) => tag.toLowerCase()).includes(activeTag);
-        return searchMatch && toneMatch && typeMatch && tagMatch;
-      });
-
-      output.sort((a, b) => {
-        if (sort === "title") return a.title.localeCompare(b.title);
-        if (sort === "used") return b.useCount - a.useCount;
-        if (sort === "favorite") {
-          if (a.favorite === b.favorite) return dateMs(b.updatedAt) - dateMs(a.updatedAt);
-          return a.favorite ? -1 : 1;
-        }
-        return dateMs(b.updatedAt) - dateMs(a.updatedAt);
-      });
-
-      return output;
+    function onNew(){state.active=null;ui.form.reset();ui.tone.value="practical";ui.type.value="planning";render();status("draft")}
+    function onCopy(){const p=payload();if(!p.content){status("needData");return}navigator.clipboard.writeText(p.content).then(()=>{const a=active();if(a){a.useCount++;a.updatedAt=iso();savePrompts();render()}status("copied")}).catch(()=>status("clipFail"))}
+    function onDup(){const a=active();if(!a){status("choose");return}const c={...a,id:uid(),title:a.title+" (copy)",favorite:false,useCount:0,createdAt:iso(),updatedAt:iso(),versions:a.versions.slice(-8)};
+      state.prompts.unshift(c);state.active=c.id;savePrompts();render();fillForm();status("duplicated")}
+    function onFav(){const a=active();if(!a){status("choose");return}a.favorite=!a.favorite;a.updatedAt=iso();savePrompts();render();status(a.favorite?"favOn":"favOff")}
+    function onDel(){const a=active();if(!a){status("choose");return}if(!confirm(tr("delAsk")))return;state.prompts=state.prompts.filter(x=>x.id!==a.id);state.active=state.prompts[0]?.id||null;savePrompts();render();fillForm();status("deleted")}
+    function onExport(){const blob=new Blob([JSON.stringify(state.prompts,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+      a.href=url;a.download="prompt-forge-export.json";a.click();URL.revokeObjectURL(url);status("exported")}
+    function onImport(ev){
+      const f=ev.target.files[0];ev.target.value="";if(!f)return;const r=new FileReader();
+      r.onload=()=>{try{const j=JSON.parse(String(r.result));if(!Array.isArray(j))throw new Error("JSON");
+        const p=j.map(norm).filter(Boolean);if(!p.length)throw new Error("data");state.prompts=p;state.active=p[0].id;savePrompts();render();fillForm();status("imported",{n:p.length})}
+        catch(err){status("importFail",{e:err.message||"error"})}};r.readAsText(f)
     }
-
-    function onSavePrompt(event) {
-      event.preventDefault();
-      const payload = getFormPayload();
-      if (!payload.title || !payload.content) {
-        setStatus("Title and body are required.");
-        return;
-      }
-
-      const active = findActive();
-      if (!active) {
-        const next = {
-          id: uid(),
-          title: payload.title,
-          tone: payload.tone,
-          type: payload.type,
-          tags: payload.tags,
-          content: payload.content,
-          favorite: false,
-          useCount: 0,
-          createdAt: nowIso(),
-          updatedAt: nowIso(),
-          versions: []
-        };
-        prompts.unshift(next);
-        activePromptId = next.id;
-        savePrompts();
-        render();
-        fillFormFromActive();
-        setStatus("Prompt created.");
-        return;
-      }
-
-      const changed = payload.content !== active.content;
-      if (changed) {
-        active.versions.push({
-          id: uid(),
-          note: payload.note || "Content update",
-          content: active.content,
-          createdAt: nowIso()
-        });
-        active.versions = active.versions.slice(-40);
-      }
-
-      active.title = payload.title;
-      active.tone = payload.tone;
-      active.type = payload.type;
-      active.tags = payload.tags;
-      active.content = payload.content;
-      active.updatedAt = nowIso();
-
-      savePrompts();
-      render();
-      setStatus(changed ? "Prompt updated and version archived." : "Prompt metadata saved.");
-    }
-
-    function onCreateNew() {
-      activePromptId = null;
-      ui.form.reset();
-      ui.toneSelect.value = "professional";
-      ui.typeSelect.value = "marketing";
-      ui.titleInput.focus();
-      render();
-      setStatus("New draft ready.");
-    }
-
-    function onCopyPrompt() {
-      const payload = getFormPayload();
-      if (!payload.content) {
-        setStatus("Nothing to copy.");
-        return;
-      }
-
-      navigator.clipboard.writeText(payload.content).then(() => {
-        const active = findActive();
-        if (active) {
-          active.useCount += 1;
-          active.updatedAt = nowIso();
-          savePrompts();
-          render();
-        }
-        setStatus("Prompt copied.");
-      }).catch(() => setStatus("Clipboard failed. Try manual copy."));
-    }
-
-    function onDuplicatePrompt() {
-      const active = findActive();
-      if (!active) {
-        setStatus("Select a prompt first.");
-        return;
-      }
-
-      const clone = {
-        ...active,
-        id: uid(),
-        title: active.title + " (copy)",
-        favorite: false,
-        useCount: 0,
-        createdAt: nowIso(),
-        updatedAt: nowIso(),
-        versions: active.versions.slice(-5)
-      };
-      prompts.unshift(clone);
-      activePromptId = clone.id;
-      savePrompts();
-      render();
-      fillFormFromActive();
-      setStatus("Prompt duplicated.");
-    }
-
-    function onToggleFavorite() {
-      const active = findActive();
-      if (!active) {
-        setStatus("Select a prompt first.");
-        return;
-      }
-
-      active.favorite = !active.favorite;
-      active.updatedAt = nowIso();
-      savePrompts();
-      render();
-      setStatus(active.favorite ? "Marked as favorite." : "Removed from favorites.");
-    }
-
-    function onDeletePrompt() {
-      const active = findActive();
-      if (!active) {
-        setStatus("Select a prompt first.");
-        return;
-      }
-
-      if (!confirm("Delete this prompt permanently?")) return;
-      prompts = prompts.filter((prompt) => prompt.id !== active.id);
-      activePromptId = prompts[0] ? prompts[0].id : null;
-      savePrompts();
-      render();
-      fillFormFromActive();
-      setStatus("Prompt deleted.");
-    }
-
-    function onExportJson() {
-      const blob = new Blob([JSON.stringify(prompts, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "prompt-forge-export.json";
-      a.click();
-      URL.revokeObjectURL(url);
-      setStatus("Vault exported.");
-    }
-
-    function onImportJson(event) {
-      const file = event.target.files[0];
-      event.target.value = "";
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(String(reader.result));
-          if (!Array.isArray(data)) throw new Error("Invalid file.");
-          const parsed = data.map(normalizePrompt).filter(Boolean);
-          if (!parsed.length) throw new Error("No valid prompts found.");
-          prompts = parsed;
-          activePromptId = prompts[0].id;
-          savePrompts();
-          render();
-          fillFormFromActive();
-          setStatus("Import complete.");
-        } catch (error) {
-          setStatus("Import failed. " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function fillFormFromActive() {
-      const active = findActive();
-      if (!active) {
-        ui.form.reset();
-        ui.noteInput.value = "";
-        return;
-      }
-
-      ui.titleInput.value = active.title;
-      ui.toneSelect.value = active.tone;
-      ui.typeSelect.value = active.type;
-      ui.tagsInput.value = active.tags.join(", ");
-      ui.contentInput.value = active.content;
-      ui.noteInput.value = "";
-    }
-
-    function findActive() {
-      return prompts.find((prompt) => prompt.id === activePromptId) || null;
-    }
-
-    function getFormPayload() {
-      return {
-        title: ui.titleInput.value.trim(),
-        tone: ui.toneSelect.value,
-        type: ui.typeSelect.value,
-        tags: ui.tagsInput.value.split(",").map((tag) => tag.trim().toLowerCase()).filter(Boolean),
-        note: ui.noteInput.value.trim(),
-        content: ui.contentInput.value.trim()
-      };
-    }
-
-    function setStatus(text) {
-      ui.status.textContent = text;
-    }
-
-    function uid() {
-      return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-5);
-    }
-
-    function nowIso() {
-      return new Date().toISOString();
-    }
-
-    function dateMs(value) {
-      return new Date(value).getTime() || 0;
-    }
-
-    function formatDate(value) {
-      const date = new Date(value);
-      return date.toLocaleString();
-    }
-
-    function escapeHtml(value) {
-      return value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-    }
+    function fillForm(){const a=active();if(!a){ui.form.reset();ui.tone.value="practical";ui.type.value="planning";ui.note.value="";return}
+      ui.title.value=a.title;ui.tone.value=a.tone;ui.type.value=a.type;ui.tagsInput.value=a.tags.join(", ");ui.content.value=a.content;ui.note.value=""}
+    function payload(){return{title:ui.title.value.trim(),tone:ui.tone.value,type:ui.type.value,tags:ui.tagsInput.value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean),note:ui.note.value.trim(),content:ui.content.value.trim()}}
+    function active(){return state.prompts.find(x=>x.id===state.active)||null}
+    function meta(p){const fav=p.favorite?` | ${tr("favorite")}`:"";return`${tr("y_"+p.type)} | ${tr("t_"+p.tone)} | ${tr("used",{n:p.useCount})}${fav}`}
+    function setOpts(sel,map){Array.from(sel.options).forEach(o=>{if(map[o.value])o.textContent=map[o.value]})}
+    function status(key,vars={}){state.statusKey=key;state.statusVars=vars;refreshStatus()}
+    function refreshStatus(){ui.status.textContent=tr(state.statusKey||"metaSaved",state.statusVars||{})}
+    function tr(k,v={}){const d=I18N[state.lang]||I18N.lt;const s=(d[k]||I18N.lt[k]||k);return s.replace(/\{(\w+)\}/g,(_,x)=>String(v[x]??""))}
+    function makeStarter(){const n=iso();return[
+      mk("Savaitės plano architektas","practical","planning",["planavimas","prioritetai","savaitė"],"Veik kaip asmeninis produktyvumo treneris. Iš mano tikslų sudėk 7 dienų planą su prioritetais A/B/C, laiko blokais ir 3 svarbiausiomis užduotimis kasdien.\n\nTikslai:\n{{mano_tikslai}}\n\nApribojimai:\n{{mano_apribojimai}}",true,3,n),
+      mk("Ryto rutinos optimizatorius","supportive","health",["rytas","energija","įpročiai"],"Sukurk 45 min ryto rutiną pagal mano ritmą. Įtrauk aktyvumą, mitybą, planavimą ir stresą mažinančius žingsnius. Pridėk ir 15 min variantą.\n\nSituacija:\n{{situacija}}",false,2,n),
+      mk("Įpročių auditas ir atnaujinimas","direct","planning",["įpročiai","disciplina","sistema"],"Įvertink mano dabartinius įpročius ir pasiūlyk 30 dienų planą: ką pašalinti, ką pakeisti, ką įtvirtinti. Kiekvienam punktui pridėk trigerį ir atlygį.\n\nĮpročiai:\n{{įpročiai}}",false,1,n),
+      mk("Santykių konflikto mediatorius","supportive","relationships",["santykiai","konfliktas","komunikacija"],"Padėk pasiruošti sudėtingam pokalbiui. Pateik: kaip pradėti be kaltinimų, kaip išsakyti poreikį, kokius klausimus užduoti ir kaip užbaigti konstruktyviai.\n\nSituacija:\n{{konfliktas}}",false,5,n),
+      mk("Asmeninio biudžeto treneris","practical","finance",["biudžetas","išlaidos","taupymas"],"Išanalizuok mano pajamas ir išlaidas. Pasiūlyk paprastą biudžeto sistemą su 3 lygiais ir planą, kaip sutaupyti 10-20% per mėnesį.\n\nDuomenys:\n{{finansai}}",true,6,n),
+      mk("Miego kokybės gerinimo planas","practical","health",["miegas","atsistatymas","vakaro_rutina"],"Sudaryk 14 dienų miego planą: vakaro rutina, ekranų ribojimas, kofeino taisyklės ir kasdieniai rodikliai.\n\nProblema:\n{{miego_situacija}}",false,2,n),
+      mk("Skaitmeninio detokso mentorius","direct","mindset",["telefonas","dėmesys","detoksas"],"Sukurk 7 dienų skaitmeninio detokso programą be kraštutinumų. Reikia mažiau scrollinimo ir daugiau fokuso.\n\nĮpročiai:\n{{telefono_įpročiai}}",false,1,n),
+      mk("Karjeros krypties aiškumo sesija","creative","planning",["karjera","sprendimai","kryptis"],"Padėk palyginti 2-3 karjeros kryptis pagal vertybes, pajamas, augimą ir gyvenimo kokybę. Pateik 90 dienų testavimo planą.\n\nVariantai:\n{{karjeros_variantai}}",false,3,n),
+      mk("Pasitikėjimo savimi perrašymas","supportive","mindset",["pasitikėjimas","mintys","savivertė"],"Perrašyk ribojančias mintis į stiprinančias. Duok lentelę: mintis -> realistiška interpretacija -> veiksmas šiandien. Pridėk trumpą afirmacijų rinkinį.\n\nMintys:\n{{mintys}}",true,7,n),
+      mk("Streso SOS protokolas","supportive","health",["stresas","emocijos","stabilumas"],"Sukurk 10 min streso mažinimo SOS protokolą darbui ar namams: kvėpavimas, minčių iškrovimas, sprendimo seka po nusiraminimo.\n\nKas spaudžia:\n{{stresas}}",false,4,n)
+    ]}
+    function mk(title,tone,type,tags,content,favorite,useCount,n){return{id:uid(),title,tone,type,tags,content,favorite,useCount,createdAt:n,updatedAt:n,versions:[]}}
+    function readJSON(k,f){try{return JSON.parse(localStorage.getItem(k)||"null")??f}catch{return f}}
+    function pick(v,a,d){return a.includes(v)?v:d}
+    function qs(s){return document.querySelector(s)}
+    function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-5)}
+    function iso(){return new Date().toISOString()}
+    function ms(v){return new Date(v).getTime()||0}
+    function formatDate(v){return new Date(v).toLocaleString(state.lang==="lt"?"lt-LT":"en-US")}
+    function esc(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('\"',"&quot;").replaceAll("'","&#39;")}
   </script>
 </body>
 </html>
